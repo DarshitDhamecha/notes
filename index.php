@@ -1,4 +1,6 @@
 <?php
+// INSERT INTO `notes` (`sno`, `title`, `description`, `tstamp`) VALUES (NULL, 'Buy Books', 'Please buy a book from a store for me ', current_timestamp());
+$insert = false;
 // connect to the database 
 $servername = "localhost";
 $username = "root";
@@ -13,6 +15,24 @@ if (!$conn) {
 //  else {
 //     echo "Connection Was Successfull! <br>";
 // }
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+
+    $sql = "INSERT INTO `notes` (`title`, `description`) VALUES ( '$title', '$description')";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result) {
+        // echo "record insterted successfully !";
+        $insert = true;
+    } else {
+        echo "record insterted successfully !" . mysqli_error($conn);
+    }
+} else {
+    # code...
+}
+
 
 ?>
 
@@ -53,30 +73,64 @@ if (!$conn) {
             </div>
         </div>
     </nav>
+
+    <?php
+    if ($insert) {
+        echo "<div class='alert alert-warning alert-dismissible fade show' role='alert'>
+            <strong>Success!</strong> You should check in on some of those fields below.
+            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+          </div>";
+    } else {
+        # code...
+    }
+
+    ?>
+
     <div class="container my-4">
         <h2>Add a Note</h2>
-        <form>
+        <form action="/crud/index.php" method="post">
             <div class="mb-3">
                 <label for="title" class="form-label">Note Title</label>
                 <input type="text" class="form-control" name="title" id="title" aria-describedby="emailHelp">
             </div>
             <div class="mb-3">
-                <label for="desc" class="form-label">Note Description</label>
-                <textarea class="form-control" id="desc" name="desc" rows="3"></textarea>
+                <label for="description" class="form-label">Note Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Add Note</button>
         </form>
     </div>
     <div class="container">
-        <?php
-        $sql = "SELECT * FROM `notes`";
-        $result = mysqli_query($conn, $sql);
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo $row['sno'] . "Title" . $row['title'] . "Desc is" . $row['description'];
-            echo "<br>";
-        }
 
-        ?>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">SR. NO.</th>
+                    <th scope="col">TITLE</th>
+                    <th scope="col">DESCRIPTION</th>
+                    <th scope="col">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <?php
+                $sql = "SELECT * FROM `notes`";
+                $result = mysqli_query($conn, $sql);
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo " <tr>
+                    <th scope='row'>" . $row['sno'] . "</th>
+                    <td>" . $row['title'] . "</td>
+                    <td>" . $row['description'] . "</td>
+                    <td>Actions</td>
+                </tr>";
+                }
+
+
+
+                ?>
+
+            </tbody>
+        </table>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
